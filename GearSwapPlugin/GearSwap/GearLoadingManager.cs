@@ -9,15 +9,22 @@ using UnityEngine;
 namespace GearSwapPlugin.GearSwap
 {
     /// <summary>
+    /// Subject to GearLoadingObserver
     /// Subscribes to the weapon instance loading event after gear swapping to fix various state miss match issues.
     /// Updates and cleans various equip items by saving states and or updating variables after the instance loads. 
     /// </summary>
-    public class GearLoadingSubject : MonoBehaviour
+    public class GearLoadingManager : MonoBehaviour
     {
+        // Allows for multiple sentries to be deployed but player will have zero tool ammo
+        public static bool PickUpSentryOnToolChange { get; set; } = true;
+        
+        // Copies tool ammo from deployed sentry if pick up is disabled 
+        public static bool CopySentryToolAmmoOnToolChange { get; set; } = false;
+        
         private static readonly List<EnemyAgent> PrevEnemiesDetected = new List<EnemyAgent>();
         private static readonly Dictionary<InventorySlot, float> PrevClipAmmoBySlot = new Dictionary<InventorySlot, float>();
 
-        public GearLoadingSubject(IntPtr intPtr) : base(intPtr)
+        public GearLoadingManager(IntPtr intPtr) : base(intPtr)
         {
             // For Il2CppAssemblyUnhollower
         }
@@ -35,12 +42,18 @@ namespace GearSwapPlugin.GearSwap
                 case InventorySlot.GearStandard:
                 case InventorySlot.GearSpecial:
                     FillClipAmmo(slot);
-                break;
+                    break;
                 case InventorySlot.GearClass:
                     RefreshBio();
                     RefreshMineDeployer();
-                    PickUpSentry();
-                break;
+                    if (PickUpSentryOnToolChange)
+                    {
+                        PickUpSentry();
+                    } else if (CopySentryToolAmmoOnToolChange)
+                    {
+                        CopySentryToolToPlayer();
+                    }
+                    break;
             }
 
             UpdateItemUI();
@@ -148,6 +161,16 @@ namespace GearSwapPlugin.GearSwap
                 var interact = sentryInstance.m_interactPickup;
                 interact.m_interactionSourceAgent = playerAgent;
                 interact.TriggerInteractionAction();
+            }
+        }
+
+        private static void CopySentryToolToPlayer()
+        {
+            var playerAgent = PlayerManager.GetLocalPlayerAgent();
+            var sentryInstance = (from sentry in FindObjectsOfType<SentryGunInstance>() where sentry.Owner.PlayerName == playerAgent.PlayerName select sentry).FirstOrDefault();
+            if (!(sentryInstance is null))
+            {
+                PlayerBackpackManager.LocalBackpack.AmmoStorage.ClassAmmo.AddAmmo(sentryInstance.Ammo);
             }
         }
 
