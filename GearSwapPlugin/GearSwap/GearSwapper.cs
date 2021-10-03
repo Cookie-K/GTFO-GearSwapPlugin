@@ -10,9 +10,10 @@ namespace GearSwapPlugin.GearSwap
 {
     public class GearSwapper : MonoBehaviour
     {
-        public static event Action<InventorySlot> AfterSwapOnGearUnLoaded;
+        public static event Action<InventorySlot> OnGearUnLoaded;
         public static event Action<InventorySlot> BeforeGearSwap;
-        public static readonly List<InventorySlot> SwappableGearSlots = new List<InventorySlot> { InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass };
+
+        public static readonly List<InventorySlot> SwappableGearSlots = new List<InventorySlot> {InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass};
 
         private static readonly List<GearIDRange> EquipDelayedGear = new List<GearIDRange>();
         private static readonly Dictionary<string, InventorySlot> SlotByPlayfabID = new Dictionary<string, InventorySlot>();
@@ -20,6 +21,23 @@ namespace GearSwapPlugin.GearSwap
         public GearSwapper(IntPtr intPtr) : base(intPtr)
         {
             // For Il2CppAssemblyUnhollower
+        }
+
+        /// <summary>
+        /// Requests to equip the given gearID to the local player on the next possible opportunity.
+        /// See GearEquipValidator for what criteria delays equipping of a gear 
+        /// </summary>
+        /// <param name="gearId"></param>
+        public static void RequestToEquip(GearIDRange gearId)
+        {
+            if (GearEquipValidator.CanEquipNow())
+            {
+                Equip(gearId);
+            }
+            else
+            {
+                EquipDelayedGear.Add(gearId);
+            }
         }
 
         private void Start()
@@ -46,19 +64,6 @@ namespace GearSwapPlugin.GearSwap
             EquipDelayedGear.RemoveAll(equippedGear.Contains);
         }
 
-        public static bool RequestToEquip(GearIDRange gearId)
-        {
-            if (GearEquipValidator.CanEquipNow())
-            {
-                Equip(gearId);
-            }
-            else
-            {
-                EquipDelayedGear.Add(gearId);
-            }
-            return false;
-        }
-        
         private static void Equip(GearIDRange gearId)
         {
             var currSlot = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
@@ -68,6 +73,7 @@ namespace GearSwapPlugin.GearSwap
 
             if (currSlot == gearSlot)
             {
+                PlayerManager.GetLocalPlayerAgent().Inventory.UnWield();
                 PlayerBackpackManager.EquipLocalGear(gearId);
             }
             else
@@ -75,7 +81,7 @@ namespace GearSwapPlugin.GearSwap
                 PlayerBackpackManager.LocalBackpack.SpawnAndEquipGearAsync(gearSlot, gearId);
             }
 
-            AfterSwapOnGearUnLoaded?.Invoke(gearSlot);
+            OnGearUnLoaded?.Invoke(gearSlot);
         }
 
     }

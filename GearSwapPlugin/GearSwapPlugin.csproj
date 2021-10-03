@@ -434,13 +434,10 @@
         <Compile Include="Entry.cs" />
         <Compile Include="GearSwapCore.cs" />
         <Compile Include="GearSwap\GearEquipValidator.cs" />
-        <Compile Include="GearSwap\GearLoadingObserver.cs" />
         <Compile Include="GearSwap\GearLoadingSubject.cs" />
+        <Compile Include="GearSwap\GearLoadingObserver.cs" />
         <Compile Include="GearSwap\GearSwapper.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include=".gitignore" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

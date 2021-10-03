@@ -26,8 +26,8 @@ namespace GearSwapPlugin
         {
             log = Log;
                         
-            ClassInjector.RegisterTypeInIl2Cpp<GearLoadingObserver>();
             ClassInjector.RegisterTypeInIl2Cpp<GearLoadingSubject>();
+            ClassInjector.RegisterTypeInIl2Cpp<GearLoadingObserver>();
             ClassInjector.RegisterTypeInIl2Cpp<GearSwapper>();
             
             HarmonyPatches = new Harmony(GUID);

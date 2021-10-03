@@ -23,8 +23,8 @@ namespace GearSwapPlugin
                     GearSwapCore.log.LogMessage("Initializing " + GearSwapCore.NAME);
 
                     var gameObject = new GameObject(GearSwapCore.AUTHOR + " - " + GearSwapCore.NAME);
-                    gameObject.AddComponent<GearLoadingSubject>();
                     gameObject.AddComponent<GearLoadingObserver>();
+                    gameObject.AddComponent<GearLoadingSubject>();
                     gameObject.AddComponent<GearSwapper>();
 
                     Object.DontDestroyOnLoad(gameObject);

@@ -7,9 +7,13 @@ namespace GearSwapPlugin.GearSwap
 {
     public static class GearEquipValidator
     {
-        private const float TimeForWeaponToIdle = 0.25f;
+        private const float TimeForWeaponToIdle = 0.1f;
         private static float _timeSinceLastTrigger = TimeForWeaponToIdle;
         
+        /// <summary>
+        /// Validates if a weapon can be equipped this frame
+        /// </summary>
+        /// <returns>true if weapon can be equipped, false other wise</returns>
         public static bool CanEquipNow()
         {
             var canEquipNow = true;
@@ -38,6 +42,11 @@ namespace GearSwapPlugin.GearSwap
                                 wieldedItem.AimButtonHeld || wieldedItem.AimButtonPressed);
         }
 
+        /// <summary>
+        /// Gives the weapons some time to update after use
+        /// Resolves issues surrounding gear swapping immediately after the use of a bio tracker or mine deployer 
+        /// </summary>
+        /// <returns>true if weapons have not been in use for the time defined in TimeForWeaponToIdle, false other wise</returns>
         private static bool IsWeaponIdle()
         {
             if (IsInAimOrFire())
