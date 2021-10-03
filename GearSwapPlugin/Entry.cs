@@ -10,9 +10,9 @@ namespace GearSwapPlugin
         private static GameObject _go;
 
         [HarmonyPatch(typeof(GameStateManager), "ChangeState", typeof(eGameStateName))]
-        public static void Postfix(eGameStateName nextState) => StartCheatMenu(nextState);
+        public static void Postfix(eGameStateName nextState) => AddGearSwappingComponents(nextState);
 
-        private static void StartCheatMenu(eGameStateName? state = null)
+        private static void AddGearSwappingComponents(eGameStateName? state = null)
         {
             switch (state)
             {
