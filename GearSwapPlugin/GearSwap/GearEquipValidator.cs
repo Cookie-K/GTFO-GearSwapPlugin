@@ -36,10 +36,19 @@ namespace GearSwapPlugin.GearSwap
         private static bool IsInAimOrFire()
         {
             var wieldedSlot = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
-            var isLoaded = PlayerBackpackManager.GetLocalItem(wieldedSlot).IsLoaded;
-            var wieldedItem = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedItem;
-            return isLoaded && (wieldedItem.FireButton || wieldedItem.FireButtonPressed || 
-                                wieldedItem.AimButtonHeld || wieldedItem.AimButtonPressed);
+
+            if (wieldedSlot == InventorySlot.GearMelee || wieldedSlot == InventorySlot.GearStandard ||
+                wieldedSlot == InventorySlot.GearSpecial || wieldedSlot == InventorySlot.GearClass)
+            {
+                var wieldedItem = PlayerBackpackManager.GetLocalItem(wieldedSlot);
+                if (wieldedItem.IsLoaded && !(wieldedItem.Instance.TryCast<ItemEquippable>() is null))
+                {
+                    var item = wieldedItem.Instance.Cast<ItemEquippable>();
+                    return item.FireButton || item.FireButtonPressed ||
+                           item.AimButtonHeld || item.AimButtonPressed;
+                }
+            }
+            return false;
         }
 
         /// <summary>
