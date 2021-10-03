@@ -12,13 +12,25 @@ namespace GearSwapPlugin.GearSwap
     {
         public static event Action<InventorySlot> AfterSwapOnGearUnLoaded;
         public static event Action<InventorySlot> BeforeGearSwap;
-        
+        public static readonly List<InventorySlot> SwappableGearSlots = new List<InventorySlot> { InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass };
+
         private static readonly List<GearIDRange> EquipDelayedGear = new List<GearIDRange>();
         private static readonly Dictionary<string, InventorySlot> SlotByPlayfabID = new Dictionary<string, InventorySlot>();
 
         public GearSwapper(IntPtr intPtr) : base(intPtr)
         {
             // For Il2CppAssemblyUnhollower
+        }
+
+        private void Start()
+        {
+            foreach (var slot in SwappableGearSlots)
+            {
+                foreach (var gearId in GearManager.GetAllGearForSlot(slot))
+                {
+                    SlotByPlayfabID[gearId.PlayfabItemId] = slot;
+                }
+            }
         }
 
         private void Update()

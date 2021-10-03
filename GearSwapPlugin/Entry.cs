@@ -18,11 +18,11 @@ namespace GearSwapPlugin
             {
                 case null:
                     return;
-                case eGameStateName.InLevel:
+                case eGameStateName.StopElevatorRide:
                 {
-                    GearSwapCore.log.LogMessage("Initializing " + GearSwapCore.MODNAME);
+                    GearSwapCore.log.LogMessage("Initializing " + GearSwapCore.NAME);
 
-                    var gameObject = new GameObject(GearSwapCore.AUTHOR + " - " + GearSwapCore.MODNAME);
+                    var gameObject = new GameObject(GearSwapCore.AUTHOR + " - " + GearSwapCore.NAME);
                     gameObject.AddComponent<GearLoadingSubject>();
                     gameObject.AddComponent<GearLoadingObserver>();
                     gameObject.AddComponent<GearSwapper>();
@@ -33,7 +33,7 @@ namespace GearSwapPlugin
                     break;
                 }
                 case eGameStateName.AfterLevel:
-                    GearSwapCore.log.LogMessage("Closing " + GearSwapCore.MODNAME);
+                    GearSwapCore.log.LogMessage("Closing " + GearSwapCore.NAME);
                     Object.Destroy(_go);
                     break;
             }

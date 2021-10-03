@@ -1,7 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
+using GearSwapPlugin.GearSwap;
 using HarmonyLib;
+using UnhollowerRuntimeLib;
 
 namespace GearSwapPlugin
 {
@@ -10,8 +12,8 @@ namespace GearSwapPlugin
     public class GearSwapCore : BasePlugin
     {
         public const string
-            NAME = "Gear Swap",
-            MODNAME = "Gear Swap Plugin",
+            NAME = "Gear Swap Plugin",
+            MODNAME = "GearSwapPlugin",
             AUTHOR = "Cookie_K",
             GUID = "com." + AUTHOR + "." + MODNAME,
             VERSION = "0.0.0";
@@ -23,6 +25,13 @@ namespace GearSwapPlugin
         public override void Load()
         {
             log = Log;
+                        
+            ClassInjector.RegisterTypeInIl2Cpp<GearLoadingObserver>();
+            ClassInjector.RegisterTypeInIl2Cpp<GearLoadingSubject>();
+            ClassInjector.RegisterTypeInIl2Cpp<GearSwapper>();
+            
+            HarmonyPatches = new Harmony(GUID);
+            HarmonyPatches.PatchAll();
         }
     }
 }

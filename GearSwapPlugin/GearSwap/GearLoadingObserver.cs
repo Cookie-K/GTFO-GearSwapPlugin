@@ -14,6 +14,11 @@ namespace GearSwapPlugin.GearSwap
         private static readonly Dictionary<InventorySlot, float> PrevClipAmmoBySlot = new Dictionary<InventorySlot, float>();
         private static readonly List<InventorySlot> GearSlots = new List<InventorySlot> { InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass };
 
+        public GearLoadingObserver(IntPtr intPtr) : base(intPtr)
+        {
+            // For Il2CppAssemblyUnhollower
+        }
+        
         private void Start()
         {
             GearSwapper.BeforeGearSwap += CleanUpBio;

@@ -1,4 +1,5 @@
-﻿using Gear;
+﻿using System;
+using Gear;
 using Player;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace GearSwapPlugin.GearSwap
 {
     public static class GearEquipValidator
     {
-        private const float TimeForWeaponToIdle = 0.1f;
+        private const float TimeForWeaponToIdle = 0.25f;
         private static float _timeSinceLastTrigger = TimeForWeaponToIdle;
         
         public static bool CanEquipNow()
