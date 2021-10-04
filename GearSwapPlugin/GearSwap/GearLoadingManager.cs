@@ -22,7 +22,7 @@ namespace GearSwapPlugin.GearSwap
         public static bool CopySentryToolAmmoOnToolChange { get; set; } = false;
         
         private static readonly List<EnemyAgent> PrevEnemiesDetected = new List<EnemyAgent>();
-        private static readonly Dictionary<InventorySlot, float> PrevClipAmmoBySlot = new Dictionary<InventorySlot, float>();
+        private static readonly Dictionary<InventorySlot, float> PrevAmmoPercentageBySlot = new Dictionary<InventorySlot, float>();
 
         public GearLoadingManager(IntPtr intPtr) : base(intPtr)
         {
@@ -41,7 +41,7 @@ namespace GearSwapPlugin.GearSwap
             {
                 case InventorySlot.GearStandard:
                 case InventorySlot.GearSpecial:
-                    FillClipAmmo(slot);
+                    RestoreAmmoPercent(slot);
                     break;
                 case InventorySlot.GearClass:
                     RefreshBio();
@@ -65,7 +65,7 @@ namespace GearSwapPlugin.GearSwap
             {
                 case InventorySlot.GearStandard:
                 case InventorySlot.GearSpecial:
-                    SavePrevClipAmmo(slot);
+                    SavePrevAmmoPercent(slot);
                     break;
                 case InventorySlot.GearClass:
                     CleanUpBio();
@@ -73,29 +73,23 @@ namespace GearSwapPlugin.GearSwap
             }
         }
 
-        private static void SavePrevClipAmmo(InventorySlot slot)
+        private static void SavePrevAmmoPercent(InventorySlot slot)
         {
             var localAmmoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
-            PrevClipAmmoBySlot[slot] = localAmmoStorage.GetClipAmmoFromSlot(slot) *
-                                       localAmmoStorage.GetInventorySlotAmmo(slot).CostOfBullet;
+            var clipBullets = localAmmoStorage.GetClipAmmoFromSlot(slot);
+            var slotAmmoStorage = localAmmoStorage.GetInventorySlotAmmo(slot);
+            
+            PrevAmmoPercentageBySlot[slot] = (clipBullets + slotAmmoStorage.BulletsInPack) / slotAmmoStorage.BulletsMaxCap;
         }
 
-        private static void FillClipAmmo(InventorySlot slot)
+        private static void RestoreAmmoPercent(InventorySlot slot)
         {
             var localAmmoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
-            var slotAmmo = localAmmoStorage.GetInventorySlotAmmo(slot);
+            var slotAmmoStorage = localAmmoStorage.GetInventorySlotAmmo(slot);
+            var totalBullets = PrevAmmoPercentageBySlot[slot] * slotAmmoStorage.BulletsMaxCap;
 
-            if (slotAmmo.IsFull)
-            {
-                localAmmoStorage.SetClipAmmoInSlot(slot);
-                slotAmmo.AddAmmo(PrevClipAmmoBySlot[slot]);
-            }
-            else
-            {
-                slotAmmo.AddAmmo(PrevClipAmmoBySlot[slot]);    
-                localAmmoStorage.SetClipAmmoInSlot(slot);
-            }
-            
+            slotAmmoStorage.AmmoInPack = totalBullets * slotAmmoStorage.CostOfBullet;
+            localAmmoStorage.SetClipAmmoInSlot(slot);
             localAmmoStorage.UpdateSlotAmmoUI(slot);
             localAmmoStorage.NeedsSync = true;
         }
@@ -103,7 +97,7 @@ namespace GearSwapPlugin.GearSwap
         /// <summary>
         /// Clears the enemy list in bio tracker before swapping to another tool.
         /// This works with RefreshBio to avoid the situation where swapping back to bio in future will cause any
-        /// enemies already in the list to suffer from the tiny un taggable blips issue
+        /// enemies already in the list to suffer from the tiny un-taggable blips issue
         /// </summary>
         private static void CleanUpBio()
         {
@@ -120,7 +114,7 @@ namespace GearSwapPlugin.GearSwap
         /// Adds any previous enemies detected back into the detected enemies list in the bio tracker after gear the
         /// instance loads.
         /// This works with CleanUpBio to avoid the situation where swapping back to bio in future will cause any
-        /// enemies already in the list to suffer from the tiny un taggable blips issue
+        /// enemies already in the list to suffer from the tiny un-taggable blips issue
         /// </summary>
         private static void RefreshBio()
         {
@@ -176,12 +170,18 @@ namespace GearSwapPlugin.GearSwap
 
         /// <summary>
         /// Strange way I found to update the entire Weapons UI (not just the ammo counts)
+        ///
+        /// Note: When switching too many times in only a few frames, wilded item is NONE.
         /// </summary>
         private static void UpdateItemUI()
         {
             var currWielded = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
             PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(InventorySlot.HackingTool);
-            PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(currWielded);
+
+            if (currWielded != InventorySlot.None)
+            {
+                PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(currWielded);    
+            }
         }
 
         private void OnDestroy()
