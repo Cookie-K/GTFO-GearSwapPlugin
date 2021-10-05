@@ -24,8 +24,8 @@ namespace GearSwapPlugin
 
                     var gameObject = new GameObject(GearSwapCore.AUTHOR + " - " + GearSwapCore.NAME);
                     gameObject.AddComponent<GearLoadingObserver>();
+                    gameObject.AddComponent<GearSwapConsistencyManager>();
                     gameObject.AddComponent<GearSwapManager>();
-                    gameObject.AddComponent<GearSwapper>();
 
                     Object.DontDestroyOnLoad(gameObject);
 

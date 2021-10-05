@@ -21,7 +21,7 @@ namespace GearSwapPlugin.GearSwap
         
         private void Start()
         {
-            GearSwapper.OnGearUnLoaded += AddToUnloadedSlots;
+            GearSwapManager.OnGearUnLoaded += AddToUnloadedSlots;
         }
 
         private void Update()
@@ -45,7 +45,7 @@ namespace GearSwapPlugin.GearSwap
 
         private void OnDestroy()
         {
-            GearSwapper.OnGearUnLoaded -= AddToUnloadedSlots;
+            GearSwapManager.OnGearUnLoaded -= AddToUnloadedSlots;
         }
     }
 }

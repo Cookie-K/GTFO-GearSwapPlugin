@@ -434,9 +434,9 @@
         <Compile Include="Entry.cs" />
         <Compile Include="GearSwapCore.cs" />
         <Compile Include="GearSwap\GearEquipValidator.cs" />
-        <Compile Include="GearSwap\GearSwapManager.cs" />
+        <Compile Include="GearSwap\GearSwapConsistencyManager.cs" />
         <Compile Include="GearSwap\GearLoadingObserver.cs" />
-        <Compile Include="GearSwap\GearSwapper.cs" />
+        <Compile Include="GearSwap\GearSwapManager.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
