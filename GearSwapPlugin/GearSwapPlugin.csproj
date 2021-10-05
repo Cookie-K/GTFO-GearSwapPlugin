@@ -434,7 +434,7 @@
         <Compile Include="Entry.cs" />
         <Compile Include="GearSwapCore.cs" />
         <Compile Include="GearSwap\GearEquipValidator.cs" />
-        <Compile Include="GearSwap\GearLoadingManager.cs" />
+        <Compile Include="GearSwap\GearSwapManager.cs" />
         <Compile Include="GearSwap\GearLoadingObserver.cs" />
         <Compile Include="GearSwap\GearSwapper.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

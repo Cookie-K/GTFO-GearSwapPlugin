@@ -13,7 +13,7 @@ namespace GearSwapPlugin.GearSwap
     /// Subscribes to the weapon instance loading event after gear swapping to fix various state miss match issues.
     /// Updates and cleans various equip items by saving states and or updating variables after the instance loads. 
     /// </summary>
-    public class GearLoadingManager : MonoBehaviour
+    public class GearSwapManager : MonoBehaviour
     {
         // Allows for multiple sentries to be deployed but player will have zero tool ammo
         public static bool PickUpSentryOnToolChange { get; set; } = true;
@@ -24,7 +24,7 @@ namespace GearSwapPlugin.GearSwap
         private static readonly List<EnemyAgent> PrevEnemiesDetected = new List<EnemyAgent>();
         private static readonly Dictionary<InventorySlot, float> PrevAmmoPercentageBySlot = new Dictionary<InventorySlot, float>();
 
-        public GearLoadingManager(IntPtr intPtr) : base(intPtr)
+        public GearSwapManager(IntPtr intPtr) : base(intPtr)
         {
             // For Il2CppAssemblyUnhollower
         }
@@ -86,7 +86,8 @@ namespace GearSwapPlugin.GearSwap
         {
             var localAmmoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
             var slotAmmoStorage = localAmmoStorage.GetInventorySlotAmmo(slot);
-            var totalBullets = PrevAmmoPercentageBySlot[slot] * slotAmmoStorage.BulletsMaxCap;
+            // Give an extra one percent to compensate for ost ammo during conversion 
+            var totalBullets = (PrevAmmoPercentageBySlot[slot] + 0.01f) * slotAmmoStorage.BulletsMaxCap;
 
             slotAmmoStorage.AmmoInPack = totalBullets * slotAmmoStorage.CostOfBullet;
             localAmmoStorage.SetClipAmmoInSlot(slot);
@@ -149,7 +150,15 @@ namespace GearSwapPlugin.GearSwap
         private static void PickUpSentry()
         {
             var playerAgent = PlayerManager.GetLocalPlayerAgent();
-            var sentryInstance = (from sentry in FindObjectsOfType<SentryGunInstance>() where sentry.Owner.PlayerName == playerAgent.PlayerName select sentry).FirstOrDefault();
+            var toolItem = PlayerBackpackManager.GetLocalItem(InventorySlot.GearClass);
+            if (toolItem.TryCast<SentryGunFirstPerson>() is null ||
+                toolItem.Status != eInventoryItemStatus.Deployed) return;
+            
+            var sentryInstance =
+                (from sentry in FindObjectsOfType<SentryGunInstance>()
+                    where sentry.Owner.PlayerName == playerAgent.PlayerName
+                    select sentry).FirstOrDefault();
+
             if (!(sentryInstance is null))
             {
                 var interact = sentryInstance.m_interactPickup;
@@ -181,6 +190,10 @@ namespace GearSwapPlugin.GearSwap
             if (currWielded != InventorySlot.None)
             {
                 PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(currWielded);    
+            }
+            else
+            {
+                PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(InventorySlot.GearMelee);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Enemies;
 using Gear;
+using LibCpp2IL;
 using Player;
 using UnityEngine;
 
@@ -12,10 +13,9 @@ namespace GearSwapPlugin.GearSwap
     {
         public static event Action<InventorySlot> OnGearUnLoaded;
         public static event Action<InventorySlot> BeforeGearSwap;
-
         public static readonly List<InventorySlot> SwappableGearSlots = new List<InventorySlot> {InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass};
 
-        private static readonly List<GearIDRange> EquipDelayedGear = new List<GearIDRange>();
+        private static readonly Dictionary<InventorySlot, GearIDRange> EquipDelayedGear = new Dictionary<InventorySlot, GearIDRange>();
         private static readonly Dictionary<string, InventorySlot> SlotByPlayfabID = new Dictionary<string, InventorySlot>();
 
         public GearSwapper(IntPtr intPtr) : base(intPtr)
@@ -25,7 +25,8 @@ namespace GearSwapPlugin.GearSwap
 
         /// <summary>
         /// Requests to equip the given gearID to the local player on the next possible opportunity.
-        /// See GearEquipValidator for what criteria delays equipping of a gear 
+        /// Any slots that already have an item pending to be equipped will be over written by the passed gear.
+        /// See GearEquipValidator for what criteria delays equipping of a gear.
         /// </summary>
         /// <param name="gearId"></param>
         public static void RequestToEquip(GearIDRange gearId)
@@ -36,7 +37,7 @@ namespace GearSwapPlugin.GearSwap
             }
             else
             {
-                EquipDelayedGear.Add(gearId);
+                EquipDelayedGear[SlotByPlayfabID[gearId.PlayfabItemId]] = gearId;
             }
         }
 
@@ -55,13 +56,16 @@ namespace GearSwapPlugin.GearSwap
         {
             if (EquipDelayedGear.Count <= 0 || !GearEquipValidator.CanEquipNow()) return;
             
-            var equippedGear = new List<GearIDRange>();
-            foreach (var gearId in EquipDelayedGear)
+            var equippedSlot = new List<InventorySlot>();
+            foreach (var (slot, gearId) in EquipDelayedGear)
             {
                 Equip(gearId);
-                equippedGear.Add(gearId);
+                equippedSlot.Add(slot);
             }
-            EquipDelayedGear.RemoveAll(equippedGear.Contains);
+            foreach (var slot in equippedSlot)
+            {
+                EquipDelayedGear.Remove(slot);
+            }
         }
 
         private static void Equip(GearIDRange gearId)

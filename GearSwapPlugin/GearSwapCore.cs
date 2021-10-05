@@ -26,7 +26,7 @@ namespace GearSwapPlugin
         {
             log = Log;
                         
-            ClassInjector.RegisterTypeInIl2Cpp<GearLoadingManager>();
+            ClassInjector.RegisterTypeInIl2Cpp<GearSwapManager>();
             ClassInjector.RegisterTypeInIl2Cpp<GearLoadingObserver>();
             ClassInjector.RegisterTypeInIl2Cpp<GearSwapper>();
             
