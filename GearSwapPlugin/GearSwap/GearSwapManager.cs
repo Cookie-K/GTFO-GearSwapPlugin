@@ -41,6 +41,18 @@ namespace GearSwapPlugin.GearSwap
             }
         }
 
+        /// <summary>
+        /// Whether or not to pick up any deployed sentries on tool change: default true. 
+        /// If disabled, sentries will not be picked up and remain deployed regardless of the player's tool item.
+        /// If sentry is deployed, the player will have zero tool ammo (can be reclaimed by picking up sentry)
+        /// 
+        /// </summary>
+        /// <param name="pickUp">Whether or not to pick up deployed sentries on tool change</param>
+        public static void SetPickUpSentryOnToolChange(bool pickUp)
+        {
+            GearSwapConsistencyManager.PickUpSentryOnToolChange = pickUp;
+        }
+
         private void Start()
         {
             foreach (var slot in SwappableGearSlots)

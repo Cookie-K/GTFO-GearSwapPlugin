@@ -15,8 +15,7 @@ namespace GearSwapPlugin.GearSwap
     /// </summary>
     public class GearSwapConsistencyManager : MonoBehaviour
     {
-        // Allows for multiple sentries to be deployed but player will have zero tool ammo
-        public static bool PickUpSentryOnToolChange { get; set; } = true;
+        internal static bool PickUpSentryOnToolChange { get; set; } = true;
 
         private static readonly List<EnemyAgent> PrevEnemiesDetected = new List<EnemyAgent>();
         private static readonly Dictionary<InventorySlot, float> PrevAmmoPercentageBySlot = new Dictionary<InventorySlot, float>();
@@ -51,6 +50,7 @@ namespace GearSwapPlugin.GearSwap
             }
 
             UpdateItemUI();
+            PlayerManager.GetLocalPlayerAgent().Sync.SyncInventory(true);
         }
 
         private static void BeforeGearInstanceUnload(InventorySlot slot)
@@ -80,8 +80,8 @@ namespace GearSwapPlugin.GearSwap
         {
             var localAmmoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
             var slotAmmoStorage = localAmmoStorage.GetInventorySlotAmmo(slot);
-            // Give an extra one percent to compensate for ost ammo during conversion 
-            var totalBullets = (PrevAmmoPercentageBySlot[slot] + 0.01f) * slotAmmoStorage.BulletsMaxCap;
+            // Give an extra one percent to compensate for lost ammo during conversion (unless if full)
+            var totalBullets = PrevAmmoPercentageBySlot[slot] + (slotAmmoStorage.IsFull ? 0f : 0.01f) * slotAmmoStorage.BulletsMaxCap;
 
             slotAmmoStorage.AmmoInPack = totalBullets * slotAmmoStorage.CostOfBullet;
             localAmmoStorage.SetClipAmmoInSlot(slot);
@@ -170,16 +170,9 @@ namespace GearSwapPlugin.GearSwap
         private static void UpdateItemUI()
         {
             var currWielded = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
-            PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(InventorySlot.HackingTool);
-
-            if (currWielded != InventorySlot.None)
-            {
-                PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(currWielded);    
-            }
-            else
-            {
-                PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(InventorySlot.GearMelee);
-            }
+            var tempWield = currWielded == InventorySlot.HackingTool ? InventorySlot.GearMelee : InventorySlot.HackingTool;
+            PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(tempWield);
+            PlayerManager.GetLocalPlayerAgent().Sync.WantsToWieldSlot(currWielded != InventorySlot.None ? currWielded : InventorySlot.GearMelee);
         }
 
         private void OnDestroy()

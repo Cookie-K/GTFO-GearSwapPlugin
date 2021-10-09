@@ -18,9 +18,9 @@ namespace GearSwapPlugin
             GUID = "com." + AUTHOR + "." + MODNAME,
             VERSION = "0.0.0";
         
-        public static ManualLogSource log;
+        internal static ManualLogSource log;
         
-        public Harmony HarmonyPatches { get; private set; }
+        private Harmony HarmonyPatches { get; set; }
 
         public override void Load()
         {

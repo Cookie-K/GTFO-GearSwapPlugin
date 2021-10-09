@@ -38,7 +38,7 @@ namespace GearSwapPlugin.GearSwap
 
         }
 
-        public void AddToUnloadedSlots(InventorySlot slot)
+        private void AddToUnloadedSlots(InventorySlot slot)
         {
             _unloadedSlots.Add(slot);
         }
