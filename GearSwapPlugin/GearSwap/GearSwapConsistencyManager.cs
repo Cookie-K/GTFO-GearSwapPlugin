@@ -81,7 +81,7 @@ namespace GearSwapPlugin.GearSwap
             var localAmmoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
             var slotAmmoStorage = localAmmoStorage.GetInventorySlotAmmo(slot);
             // Give an extra one percent to compensate for lost ammo during conversion (unless if full)
-            var totalBullets = PrevAmmoPercentageBySlot[slot] + (slotAmmoStorage.IsFull ? 0f : 0.01f) * slotAmmoStorage.BulletsMaxCap;
+            var totalBullets = (PrevAmmoPercentageBySlot[slot] + (slotAmmoStorage.IsFull ? 0f : 0.01f)) * slotAmmoStorage.BulletsMaxCap;
 
             slotAmmoStorage.AmmoInPack = totalBullets * slotAmmoStorage.CostOfBullet;
             localAmmoStorage.SetClipAmmoInSlot(slot);

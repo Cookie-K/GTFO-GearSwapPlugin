@@ -12,6 +12,12 @@ namespace GearSwapPlugin.GearSwap
         
         /// <summary>
         /// Validates if a weapon can be equipped this frame
+        /// For a new weapon to be equipped the following conditions must be met:  
+        /// 
+        /// - Melee must not be in use (in idle state)
+        /// - Weapon must not be in fire or aim (there's also slight delay added after weapon not in use to consider weapons at idle to prevent audio bugs)
+        /// - Player must not be hacking
+        /// - C-Foam can not be spraying 
         /// </summary>
         /// <returns>true if weapon can be equipped, false other wise</returns>
         public static bool CanEquipNow()
@@ -20,6 +26,8 @@ namespace GearSwapPlugin.GearSwap
 
             canEquipNow &= IsMeleeNotInUse();
             canEquipNow &= IsWeaponIdle();
+            canEquipNow &= IsNotHacking();
+            canEquipNow &= IsFoamNotFiring();
 
             return canEquipNow;
         }
@@ -66,6 +74,19 @@ namespace GearSwapPlugin.GearSwap
 
             _timeSinceLastTrigger -= Time.deltaTime;
             return _timeSinceLastTrigger <= 0;
+        }
+
+        private static bool IsFoamNotFiring()
+        {
+            var toolItem = PlayerBackpackManager.GetLocalItem(InventorySlot.GearClass);
+            var isGlueGun = !(toolItem.Instance.TryCast<GlueGun>() is null);
+            return !(isGlueGun && (toolItem.Instance.Cast<GlueGun>().m_maxPressureMet || toolItem.Instance.Cast<GlueGun>().m_firing));
+        }
+
+        private static bool IsNotHacking()
+        {
+            var currWielded = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
+            return !(currWielded == InventorySlot.HackingTool && PlayerBackpackManager.GetLocalItem(InventorySlot.HackingTool).Instance.Cast<HackingTool>().IsBusy);
         }
     }
 }
