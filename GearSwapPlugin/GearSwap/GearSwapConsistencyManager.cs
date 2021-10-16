@@ -41,11 +41,6 @@ namespace GearSwapPlugin.GearSwap
                     break;
                 case InventorySlot.GearClass:
                     RefreshBio();
-                    RefreshMineDeployer();
-                    if (PickUpSentryOnToolChange)
-                    {
-                        PickUpSentry();
-                    }
                     break;
             }
 
@@ -63,6 +58,10 @@ namespace GearSwapPlugin.GearSwap
                     break;
                 case InventorySlot.GearClass:
                     CleanUpBio();
+                    if (PickUpSentryOnToolChange)
+                    {
+                        PickUpSentry();
+                    }
                     break;
             }
         }
@@ -126,33 +125,20 @@ namespace GearSwapPlugin.GearSwap
         }
 
         /// <summary>
-        /// Fixes issue where swapping to mine deployer after using mines causes the player to be in perpetual cool
-        /// down.
-        /// </summary>
-        private static void RefreshMineDeployer()
-        {
-            var item = PlayerBackpackManager.GetLocalItem(InventorySlot.GearClass).Instance;
-            if (item.TryCast<MineDeployerFirstPerson>() is null) return;
-            
-            var deployer = item.Cast<MineDeployerFirstPerson>();
-            deployer.ShowItem();
-        }
-
-        /// <summary>
         /// Picks up any deployed sentry in order to refund the tool refill inside the sentry
         /// </summary>
         private static void PickUpSentry()
         {
             var playerAgent = PlayerManager.GetLocalPlayerAgent();
             var toolItem = PlayerBackpackManager.GetLocalItem(InventorySlot.GearClass);
-            if (toolItem.TryCast<SentryGunFirstPerson>() is null ||
-                toolItem.Status != eInventoryItemStatus.Deployed) return;
+
+            if (toolItem.Instance is null || toolItem.Instance.TryCast<SentryGunFirstPerson>() is null || toolItem.Status != eInventoryItemStatus.Deployed) return;
             
             var sentryInstance =
                 (from sentry in FindObjectsOfType<SentryGunInstance>()
                     where sentry.Owner.PlayerName == playerAgent.PlayerName
                     select sentry).FirstOrDefault();
-
+            
             if (!(sentryInstance is null))
             {
                 var interact = sentryInstance.m_interactPickup;
