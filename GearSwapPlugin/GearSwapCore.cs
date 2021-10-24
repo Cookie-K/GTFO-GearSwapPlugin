@@ -16,7 +16,7 @@ namespace GearSwapPlugin
             MODNAME = "GearSwapPlugin",
             AUTHOR = "Cookie_K",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "0.0.0";
+            VERSION = "1.0.1";
         
         internal static ManualLogSource log;
         
