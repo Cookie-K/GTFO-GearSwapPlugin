@@ -17,7 +17,9 @@ namespace GearSwapPlugin.GearSwap
         /// - Melee must not be in use (in idle state)
         /// - Weapon must not be in fire or aim (there's also slight delay added after weapon not in use to consider weapons at idle to prevent audio bugs)
         /// - Player must not be hacking
-        /// - C-Foam can not be spraying 
+        /// - C-Foam can not be spraying
+        /// - Player can not be carrying in level item (cell, turbine, etc.)
+        /// - Player can not be interacting (pick up item, climb ladder, etc.) 
         /// </summary>
         /// <returns>true if weapon can be equipped, false other wise</returns>
         public static bool CanEquipNow()
@@ -28,6 +30,8 @@ namespace GearSwapPlugin.GearSwap
             canEquipNow &= IsWeaponIdle();
             canEquipNow &= IsNotHacking();
             canEquipNow &= IsFoamNotFiring();
+            canEquipNow &= IsNotCarryingLevelItem();
+            canEquipNow &= IsNotInteracting();
 
             return canEquipNow;
         }
@@ -87,6 +91,16 @@ namespace GearSwapPlugin.GearSwap
         {
             var currWielded = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
             return !(currWielded == InventorySlot.HackingTool && PlayerBackpackManager.GetLocalItem(InventorySlot.HackingTool).Instance.Cast<HackingTool>().IsBusy);
+        }
+
+        private static bool IsNotCarryingLevelItem()
+        {
+            return PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot != InventorySlot.InLevelCarry;
+        }
+        
+        private static bool IsNotInteracting()
+        {
+            return !PlayerManager.GetLocalPlayerAgent().Interaction.HasWorldInteraction;
         }
     }
 }
