@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Enemies;
-using Gear;
-using LibCpp2IL;
+﻿using Gear;
 using Player;
 using UnityEngine;
 
@@ -13,15 +8,10 @@ namespace GearSwapPlugin.GearSwap
     {
         public static event Action<InventorySlot> OnGearUnLoaded;
         public static event Action<InventorySlot> BeforeGearSwap;
-        public static readonly List<InventorySlot> SwappableGearSlots = new List<InventorySlot> {InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass};
 
-        private static readonly Dictionary<InventorySlot, GearIDRange> EquipDelayedGear = new Dictionary<InventorySlot, GearIDRange>();
-        private static readonly Dictionary<string, InventorySlot> SlotByPlayfabID = new Dictionary<string, InventorySlot>();
-
-        public GearSwapManager(IntPtr intPtr) : base(intPtr)
-        {
-            // For Il2CppAssemblyUnhollower
-        }
+        private static readonly List<InventorySlot> SwappableGearSlots = new () {InventorySlot.GearMelee, InventorySlot.GearStandard, InventorySlot.GearSpecial, InventorySlot.GearClass};
+        private static readonly Dictionary<InventorySlot, GearIDRange> EquipDelayedGear = new ();
+        private static readonly Dictionary<string, InventorySlot> SlotByPlayfabID = new ();
 
         /// <summary>
         /// Requests to equip the given gearID to the local player on the next possible opportunity.

@@ -1,5 +1,4 @@
-﻿using System;
-using Gear;
+﻿using Gear;
 using Player;
 using UnityEngine;
 
@@ -41,8 +40,14 @@ namespace GearSwapPlugin.GearSwap
             var item = PlayerBackpackManager.GetLocalItem(InventorySlot.GearMelee);
             if (!item.IsLoaded) return false;
 
+            var wieldedSlot = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
+            if (wieldedSlot != InventorySlot.GearMelee)
+            {
+                return true;
+            }
+
             var weaponState = item.Instance.Cast<MeleeWeaponFirstPerson>().CurrentStateName;
-            return weaponState == eMeleeWeaponState.Idle || weaponState == eMeleeWeaponState.None;
+            return weaponState is eMeleeWeaponState.Idle or eMeleeWeaponState.None;
         }
 
         private static bool IsInAimOrFire()
@@ -82,6 +87,12 @@ namespace GearSwapPlugin.GearSwap
 
         private static bool IsFoamNotFiring()
         {
+            var wieldedSlot = PlayerManager.GetLocalPlayerAgent().Inventory.WieldedSlot;
+            if (wieldedSlot != InventorySlot.GearClass)
+            {
+                return true;
+            }
+            
             var toolItem = PlayerBackpackManager.GetLocalItem(InventorySlot.GearClass);
             var isGlueGun = !(toolItem.Instance.TryCast<GlueGun>() is null);
             return !(isGlueGun && (toolItem.Instance.Cast<GlueGun>().m_maxPressureMet || toolItem.Instance.Cast<GlueGun>().m_firing));

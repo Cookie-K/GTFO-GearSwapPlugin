@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Player;
+﻿using Player;
 using UnityEngine;
 
 namespace GearSwapPlugin.GearSwap
@@ -12,13 +9,8 @@ namespace GearSwapPlugin.GearSwap
     public class GearLoadingObserver : MonoBehaviour
     {
         public static event Action<InventorySlot> OnGearLoaded;
-        private readonly List<InventorySlot> _unloadedSlots = new List<InventorySlot>();
+        private readonly List<InventorySlot> _unloadedSlots = new ();
 
-        public GearLoadingObserver(IntPtr intPtr) : base(intPtr)
-        {
-            // For Il2CppAssemblyUnhollower
-        }
-        
         private void Start()
         {
             GearSwapManager.OnGearUnLoaded += AddToUnloadedSlots;

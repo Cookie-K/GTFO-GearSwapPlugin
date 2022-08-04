@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Enemies;
+﻿using Enemies;
 using Gear;
 using Player;
 using UnityEngine;
@@ -17,13 +14,8 @@ namespace GearSwapPlugin.GearSwap
     {
         internal static bool PickUpSentryOnToolChange { get; set; } = true;
 
-        private static readonly List<EnemyAgent> PrevEnemiesDetected = new List<EnemyAgent>();
-        private static readonly Dictionary<InventorySlot, float> PrevAmmoPercentageBySlot = new Dictionary<InventorySlot, float>();
-
-        public GearSwapConsistencyManager(IntPtr intPtr) : base(intPtr)
-        {
-            // For Il2CppAssemblyUnhollower
-        }
+        private static readonly List<EnemyAgent> PrevEnemiesDetected = new ();
+        private static readonly Dictionary<InventorySlot, float> PrevAmmoPercentageBySlot = new ();
         
         private void Start()
         {
@@ -142,8 +134,7 @@ namespace GearSwapPlugin.GearSwap
             if (!(sentryInstance is null))
             {
                 var interact = sentryInstance.m_interactPickup;
-                interact.m_interactionSourceAgent = playerAgent;
-                interact.TriggerInteractionAction();
+                interact.TriggerInteractionAction(playerAgent);
             }
         }
 

@@ -3,7 +3,7 @@ using BepInEx.IL2CPP;
 using BepInEx.Logging;
 using GearSwapPlugin.GearSwap;
 using HarmonyLib;
-using UnhollowerRuntimeLib;
+using Il2CppInterop.Runtime.Injection;
 
 namespace GearSwapPlugin
 {
